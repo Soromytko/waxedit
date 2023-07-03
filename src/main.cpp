@@ -1,28 +1,37 @@
-#include <iostream>
+#include <GLFW/glfw3.h>
 
-#ifdef __APPLE__	
-#define APPLE_OS
-#endif
-
-#ifdef __MINGW32__
-#define WINDOWS_OS
-#endif
-
-#ifdef __linux__
-#define LINUX_OS
-#endif
-
-int main()
+int main(void)
 {
-#ifdef APPLE_OS
-	std::cout << "Hello from Apple!" << std::endl;
-#elif WINDOWS_OS
-	std::cout << "Hello from Windows!" << std::endl;
-#elif __linux__
-	std::cout << "Hello from Linux!" << std::endl;
-#endif
+    GLFWwindow* window;
 
+    /* Initialize the library */
+    if (!glfwInit())
+        return -1;
 
-	return 0;
+    /* Create a windowed mode window and its OpenGL context */
+    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        return -1;
+    }
 
+    /* Make the window's context current */
+    glfwMakeContextCurrent(window);
+
+    /* Loop until the user closes the window */
+    while (!glfwWindowShouldClose(window))
+    {
+        /* Render here */
+        //glClear(GL_COLOR_BUFFER_BIT);
+
+        /* Swap front and back buffers */
+        glfwSwapBuffers(window);
+
+        /* Poll for and process events */
+        glfwPollEvents();
+    }
+
+    glfwTerminate();
+    return 0;
 }
