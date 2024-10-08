@@ -16,4 +16,7 @@ set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(glfw)
 target_link_libraries(${EXE_NAME} glfw)
 
+# FreeType
+add_subdirectory(freetype)
+target_link_libraries(${EXE_NAME} freetype)
 
