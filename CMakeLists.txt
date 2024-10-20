@@ -20,3 +20,6 @@ target_link_libraries(${EXE_NAME} glfw)
 add_subdirectory(freetype)
 target_link_libraries(${EXE_NAME} freetype)
 
+# Gald
+add_subdirectory(glad)
+target_link_libraries(${EXE_NAME} glad)
