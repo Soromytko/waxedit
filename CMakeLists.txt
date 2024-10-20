@@ -5,7 +5,18 @@ set(EXE_NAME waxedit)
 
 project(${PROJECT_NAME})
 
-add_executable(${EXE_NAME} src/main.cpp)
+set(SOURCE_FILE_PATHS
+    src/main.cpp
+    src/App.cpp
+    src/Window.cpp
+    src/Renderer/Renderer.cpp
+    src/Renderer/IndexBuffer.cpp
+    src/Renderer/VertexBuffer.cpp
+    src/Renderer/OpenGL/OpenGLIndexBuffer.cpp
+    src/Renderer/OpenGL/OpenGLVertexBuffer.cpp
+)
+
+add_executable(${EXE_NAME} ${SOURCE_FILE_PATHS})
 
 # GLFW
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
