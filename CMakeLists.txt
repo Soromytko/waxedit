@@ -12,8 +12,11 @@ set(SOURCE_FILE_PATHS
     src/Renderer/Renderer.cpp
     src/Renderer/IndexBuffer.cpp
     src/Renderer/VertexBuffer.cpp
+    src/Renderer/VertexArray.cpp
+    src/Renderer/VertexBufferLayout.cpp
     src/Renderer/OpenGL/OpenGLIndexBuffer.cpp
     src/Renderer/OpenGL/OpenGLVertexBuffer.cpp
+    src/Renderer/OpenGL/OpenGLVertexArray.cpp
 )
 
 add_executable(${EXE_NAME} ${SOURCE_FILE_PATHS})

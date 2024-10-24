@@ -31,3 +31,32 @@ VertexBuffer* VertexBuffer::create(const float* data, size_t size)
 	}
 	return create(std::move(value));
 }
+
+int VertexBuffer::getStride() const
+{
+	return _stride;
+}
+
+const std::vector<VertexBufferLayout>& VertexBuffer::getLayouts() const
+{
+	return _layouts;
+}
+
+void VertexBuffer::setLayouts(const std::vector<VertexBufferLayout>& layouts)
+{
+	_layouts = layouts;
+	calculateOffsetsAndStride();
+}
+
+void VertexBuffer::calculateOffsetsAndStride()
+{
+	uint32_t offset = 0;
+	_stride = 0;
+	for (VertexBufferLayout& layout : _layouts)
+	{
+		layout.setOffset(offset);
+		offset += layout.getSize();
+		_stride += layout.getSize();
+	}
+}
+
