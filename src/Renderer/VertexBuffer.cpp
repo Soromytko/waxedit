@@ -7,11 +7,6 @@ VertexBuffer::VertexBuffer(std::vector<float>&& data)
 	_data = std::move(data);
 }
 
-VertexBuffer::~VertexBuffer()
-{
-	
-}
-
 VertexBuffer* VertexBuffer::create(const std::vector<float>& data)
 {
 	std::vector<float> value = data;

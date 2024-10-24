@@ -4,9 +4,8 @@
 
 class OpenGLIndexBuffer : public IndexBuffer
 {
-	//friend class IndexBuffer;
 public:
-	OpenGLIndexBuffer(std::vector<int>&& indices);
+	OpenGLIndexBuffer(std::vector<uint32_t>&& indices);
 	~OpenGLIndexBuffer();
 	void bind() const override;
 	void unbind()  const override;

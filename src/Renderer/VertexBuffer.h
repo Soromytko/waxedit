@@ -5,7 +5,6 @@ class VertexBuffer
 {
 protected:
 	VertexBuffer(std::vector<float>&& data);
-	virtual ~VertexBuffer();
 
 public:
 	static VertexBuffer* create(const std::vector<float>& data);

@@ -1,11 +1,16 @@
 #include "OpenGLIndexBuffer.h"
 
-OpenGLIndexBuffer::OpenGLIndexBuffer(std::vector<int>&& indices) :
+OpenGLIndexBuffer::OpenGLIndexBuffer(std::vector<uint32_t>&& indices) :
 	IndexBuffer(std::move(indices))
 {
 	glCreateBuffers(1, &_bufferId);
-	glBufferData(GL_ARRAY_BUFFER, _indices.size(), _indices.data(), GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, _bufferId);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _bufferId);
+	glBufferData(
+		GL_ELEMENT_ARRAY_BUFFER,
+		_indices.size() * sizeof(uint32_t),
+		static_cast<const void*>(_indices.data()),
+		GL_STATIC_DRAW
+	);
 }
 
 OpenGLIndexBuffer::~OpenGLIndexBuffer()
