@@ -39,3 +39,7 @@ target_link_libraries(${EXE_NAME} freetype)
 # Gald
 add_subdirectory(glad)
 target_link_libraries(${EXE_NAME} glad)
+
+# Glm
+add_subdirectory(glm)
+target_link_libraries(${EXE_NAME} glm)
