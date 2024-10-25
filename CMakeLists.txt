@@ -14,9 +14,11 @@ set(SOURCE_FILE_PATHS
     src/Renderer/VertexBuffer.cpp
     src/Renderer/VertexArray.cpp
     src/Renderer/VertexBufferLayout.cpp
+    src/Renderer/ShaderProgram.cpp
     src/Renderer/OpenGL/OpenGLIndexBuffer.cpp
     src/Renderer/OpenGL/OpenGLVertexBuffer.cpp
     src/Renderer/OpenGL/OpenGLVertexArray.cpp
+    src/Renderer/OpenGL/OpenGLShaderProgram.cpp
 )
 
 add_executable(${EXE_NAME} ${SOURCE_FILE_PATHS})
