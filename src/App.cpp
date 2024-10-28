@@ -1,10 +1,8 @@
 #include<iostream>
+#include <GLFW/glfw3.h>
+#include <rendell/rendell.h>
 #include "App.h"
 #include "Window.h"
-#include "Renderer/Renderer.h"
-#include "Renderer/VertexBuffer.h"
-#include "Renderer/VertexArray.h"
-#include "Renderer/ShaderProgram.h"
 #include <vector>
 
 App::App()
@@ -15,7 +13,7 @@ App::App()
 		_result = -1;
 		return;
 	}
-	if (!initGraphicalApi())
+	if (!initRendell())
 	{
 		std::cout << "Failed to initialize graphical api" << std::endl;
 		_result = -1;
@@ -30,16 +28,16 @@ int App::run()
 		return _result;
 	}
 
-	IndexBuffer* indexBuffer = IndexBuffer::create({ 0, 1, 2 });
-	VertexBuffer* vertexBuffer = VertexBuffer::create({
+	rendell::IndexBuffer* indexBuffer = rendell::createIndexBuffer({ 0, 1, 2 });
+	rendell::VertexBuffer* vertexBuffer = rendell::createVertexBuffer({
 		-0.5f, -0.5f, 0.0f,
 		0.5f, -0.5f, 0.0f,
 		0.0f, 0.5f, 0.0f,
 		});
 	vertexBuffer->setLayouts({
-		{ShaderDataType::float3, false, 0},
+		{rendell::ShaderDataType::float3, false, 0},
 		});
-	VertexArray* vertexArray = VertexArray::create();
+	rendell::VertexArray* vertexArray = rendell::createVertexArray();
 	vertexArray->addVertexBuffer(vertexBuffer);
 	vertexArray->setIndexBuffer(indexBuffer);
 
@@ -59,7 +57,7 @@ int App::run()
 			FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
 		}
 	)";
-	ShaderProgram* shaderProgram = ShaderProgram::create(vertSrc, fragSrc);
+	rendell::ShaderProgram* shaderProgram = rendell::createShaderProgram(vertSrc, fragSrc);
 	std::string infoLog;
 	if (!shaderProgram->compile(&infoLog))
 	{
@@ -76,13 +74,13 @@ int App::run()
 	const float color = 31.0 / 255;
 	while (_mainWindow->isOpen())
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
-		glClearColor(color, color, color, 1);
+		//glClear(GL_COLOR_BUFFER_BIT);
+		rendell::clearColor(color, color, color, 1);
 
 		vertexArray->bind();
 
 		shaderProgram->bind();
-		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+		rendell::drawTriangles(3);
 
 		_mainWindow->swapBuffers();
 		_mainWindow->processEvents();
@@ -101,8 +99,9 @@ bool App::tryCreateMainWindow()
 	return false;
 }
 
-bool App::initGraphicalApi()
+bool App::initRendell()
 {
-	Renderer::setApi(Renderer::Api::OpenGL);
-	return Renderer::init();
+	rendell::Initer initer;
+	initer.context = static_cast<void*>(glfwGetProcAddress);
+	return rendell::init(initer);
 }

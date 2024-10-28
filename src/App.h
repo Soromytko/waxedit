@@ -10,7 +10,7 @@ public:
 
 private:
 	bool tryCreateMainWindow();
-	bool initGraphicalApi();
+	bool initRendell();
 
 	int _result{ 0 };
 	std::unique_ptr<Window> _mainWindow;

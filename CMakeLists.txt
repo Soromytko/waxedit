@@ -9,16 +9,7 @@ set(SOURCE_FILE_PATHS
     src/main.cpp
     src/App.cpp
     src/Window.cpp
-    src/Renderer/Renderer.cpp
-    src/Renderer/IndexBuffer.cpp
-    src/Renderer/VertexBuffer.cpp
-    src/Renderer/VertexArray.cpp
-    src/Renderer/VertexBufferLayout.cpp
-    src/Renderer/ShaderProgram.cpp
-    src/Renderer/OpenGL/OpenGLIndexBuffer.cpp
-    src/Renderer/OpenGL/OpenGLVertexBuffer.cpp
-    src/Renderer/OpenGL/OpenGLVertexArray.cpp
-    src/Renderer/OpenGL/OpenGLShaderProgram.cpp
+
 )
 
 add_executable(${EXE_NAME} ${SOURCE_FILE_PATHS})
@@ -36,9 +27,9 @@ target_link_libraries(${EXE_NAME} glfw)
 add_subdirectory(freetype)
 target_link_libraries(${EXE_NAME} freetype)
 
-# Gald
-add_subdirectory(glad)
-target_link_libraries(${EXE_NAME} glad)
+# Rendell
+add_subdirectory(rendell)
+target_link_libraries(${EXE_NAME} rendell)
 
 # Glm
 add_subdirectory(glm)
