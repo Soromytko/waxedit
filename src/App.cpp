@@ -80,11 +80,14 @@ int App::run()
 		vertexArray->bind();
 
 		shaderProgram->bind();
-		rendell::drawTriangles(3);
+		rendell::drawTriangleElements(indexBuffer->getIndices().size());
 
 		_mainWindow->swapBuffers();
 		_mainWindow->processEvents();
 	}
+
+	rendell::release();
+
 	return _result;
 }
 
