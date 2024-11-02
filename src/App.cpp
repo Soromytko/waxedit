@@ -1,9 +1,22 @@
 #include<iostream>
 #include <GLFW/glfw3.h>
 #include <rendell/rendell.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "App.h"
 #include "Window.h"
 #include <vector>
+#include "FontRaster.h"
+
+#define FONT_WIDTH 32.0f
+#define FONT_HEIGHT 32.0f
+
+struct Matrices
+{
+	glm::mat4 projectMat = glm::mat4(1.0);
+	glm::mat4 viewMat = glm::mat4(1.0);
+	glm::mat4 worldMat = glm::mat4(1.0);
+};
 
 App::App()
 {
@@ -19,6 +32,13 @@ App::App()
 		_result = -1;
 		return;
 	}
+	if (!initTextRenderer())
+	{
+		std::cout << "Failed to initialize TextRenderer" << std::endl;
+		_result = -1;
+		return;
+	}
+	setupTextRenderer();
 }
 
 int App::run()
@@ -28,59 +48,15 @@ int App::run()
 		return _result;
 	}
 
-	rendell::IndexBuffer* indexBuffer = rendell::createIndexBuffer({ 0, 1, 2 });
-	rendell::VertexBuffer* vertexBuffer = rendell::createVertexBuffer({
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f,
-		});
-	vertexBuffer->setLayouts({
-		{rendell::ShaderDataType::float3, false, 0},
-		});
-	rendell::VertexArray* vertexArray = rendell::createVertexArray();
-	vertexArray->addVertexBuffer(vertexBuffer);
-	vertexArray->setIndexBuffer(indexBuffer);
-
-	std::string vertSrc = R"(
-		#version 330 core
-		layout (location = 0) in vec3 aPos;
-		void main()
-		{
-		   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-		}
-	)";
-
-	std::string fragSrc = R"(
-		out vec4 FragColor;
-		void main()
-		{
-			FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-		}
-	)";
-	rendell::ShaderProgram* shaderProgram = rendell::createShaderProgram(vertSrc, fragSrc);
-	std::string infoLog;
-	if (!shaderProgram->compile(&infoLog))
-	{
-		std::cout << infoLog << std::endl;
-		return -1;
-	}
-	if (!shaderProgram->link(&infoLog))
-	{
-		std::cout << infoLog << std::endl;
-		return -1;
-	}
-	shaderProgram->freeSrc();
+	rendell::setClearBits(rendell::colorBufferBit | rendell::depthBufferBit);
 
 	const float color = 31.0 / 255;
 	while (_mainWindow->isOpen())
 	{
-		//glClear(GL_COLOR_BUFFER_BIT);
+		rendell::clear();
 		rendell::clearColor(color, color, color, 1);
 
-		vertexArray->bind();
-
-		shaderProgram->bind();
-		rendell::drawTriangleElements(indexBuffer->getIndices().size());
+		_textRenderer->draw(L"Hello World!");
 
 		_mainWindow->swapBuffers();
 		_mainWindow->processEvents();
@@ -106,5 +82,40 @@ bool App::initRendell()
 {
 	rendell::Initer initer;
 	initer.context = static_cast<void*>(glfwGetProcAddress);
-	return rendell::init(initer);
+	const bool result = rendell::init(initer);
+	if (result)
+	{
+		rendell::setPixelUnpackAlignment(1);
+	}
+	return result;
+}
+
+bool App::initTextRenderer()
+{
+	FontRaster raster("../res/Fonts/mononoki/mononoki-Regular.ttf");
+	if (!raster.isInitialized())
+	{
+		std::cout << "ERROR: FontRaster initializion failed" << std::endl;
+		return false;
+	}
+	raster.setFontSize(FONT_WIDTH, FONT_HEIGHT);
+	FontRasterizationResult fontRasterizationResult;
+	if (!raster.rasterize(fontRasterizationResult))
+	{
+		std::cout << "ERROR: FontRaster rasterization failed" << std::endl;
+		return false;
+	}
+	_textRenderer.reset(new TextRenderer(fontRasterizationResult, 600, 400));
+	return _textRenderer->isInitialized();
+}
+
+void App::setupTextRenderer()
+{
+	Matrices matrices;
+	matrices.projectMat = glm::ortho(0.0f, 600.0f, 0.0f, 400.0f, 0.1f, 100.0f);
+	matrices.worldMat = glm::translate(glm::mat4(1.0), glm::vec3(10, 10, 0.0));
+	glm::mat4 matrix = matrices.projectMat * matrices.viewMat * matrices.worldMat;
+	_textRenderer->setMatrix(matrix);
+	_textRenderer->setFontSize(glm::vec2(FONT_WIDTH, FONT_HEIGHT));
+	_textRenderer->setColor(glm::vec4(0.0f, 1.0f, 1.0f, 1.0f));
 }

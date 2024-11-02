@@ -11,6 +11,8 @@ set(SOURCE_FILE_PATHS
     src/main.cpp
     src/App.cpp
     src/Window.cpp
+    src/FontRaster.cpp
+    src/TextRenderer.cpp
 
 )
 
