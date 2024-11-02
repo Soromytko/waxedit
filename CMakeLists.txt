@@ -5,6 +5,8 @@ set(EXE_NAME waxedit)
 
 project(${PROJECT_NAME})
 
+set(CMAKE_CXX_STANDARD 17)
+
 set(SOURCE_FILE_PATHS
     src/main.cpp
     src/App.cpp
