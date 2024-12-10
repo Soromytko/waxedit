@@ -1,27 +1,32 @@
 #pragma once
 #include <iostream>
 #include <map>
-#include <filesystem>
-#include <rendell/rendell.h>
-#include "FontRasterizationResult.h"
+#include "IFontRaster.h"
+#include "freetype.h"
 
-class FontRaster
+class FontRaster : public IFontRaster
 {
 public:
 	FontRaster(const std::filesystem::path& fontPath = "");
 	~FontRaster();
 
-	bool isInitialized() const;
+	bool isInitialized() const override;
+	const std::filesystem::path& getFontPath() const override;
+	const glm::ivec2& getFontSize() const override;
 
-	void setFontPath(const std::filesystem::path& fontPath);
-	void setFontSize(uint32_t width, uint32_t height);
-	bool rasterize(FontRasterizationResult &result);
+	bool loadFont(const std::filesystem::path& fontPath) override;
+	void setFontSize(const glm::ivec2 &size) override;
 
-	const std::filesystem::path& getFontPath() const;
+	bool rasterize(wchar_t character, RasterizedChar& result) override;
 
 private:
 	bool init();
 
-	std::filesystem::path _fontPath;
-	uint32_t _width = 64, _height = 64;
+	void releaseFace();
+
+	std::filesystem::path _fontPath{};
+	glm::ivec2 _size{ 64, 64 };
+
+	bool _isFontLoaded{ false };
+	FT_Face _face{ nullptr };
 };

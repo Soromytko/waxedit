@@ -3,9 +3,9 @@
 #include <rendell/rendell.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <vector>
 #include "App.h"
 #include "Window.h"
-#include <vector>
 #include "FontRaster.h"
 
 #define FONT_WIDTH 32.0f
@@ -50,19 +50,21 @@ int App::run()
 
 	rendell::setClearBits(rendell::colorBufferBit | rendell::depthBufferBit);
 
+	_textRenderer->setText(L"Hello World!");
+
 	const float color = 31.0 / 255;
 	while (_mainWindow->isOpen())
 	{
 		rendell::clear();
 		rendell::clearColor(color, color, color, 1);
 
-		_textRenderer->draw(L"Hello World!");
+		_textRenderer->draw();
 
 		_mainWindow->swapBuffers();
 		_mainWindow->processEvents();
 	}
 
-	rendell::release();
+	rendell::releaseFace();
 
 	return _result;
 }
@@ -92,20 +94,14 @@ bool App::initRendell()
 
 bool App::initTextRenderer()
 {
-	FontRaster raster("../res/Fonts/mononoki/mononoki-Regular.ttf");
-	if (!raster.isInitialized())
+	IFontRaster *raster = new FontRaster("../res/Fonts/mononoki/mononoki-Regular.ttf");
+	if (!raster->isInitialized())
 	{
 		std::cout << "ERROR: FontRaster initializion failed" << std::endl;
 		return false;
 	}
-	raster.setFontSize(FONT_WIDTH, FONT_HEIGHT);
-	FontRasterizationResult fontRasterizationResult;
-	if (!raster.rasterize(fontRasterizationResult))
-	{
-		std::cout << "ERROR: FontRaster rasterization failed" << std::endl;
-		return false;
-	}
-	_textRenderer.reset(new TextRenderer(fontRasterizationResult, 600, 400));
+	raster->setFontSize(glm::ivec2(FONT_WIDTH, FONT_HEIGHT));
+	_textRenderer.reset(new TextRenderer(raster));
 	return _textRenderer->isInitialized();
 }
 
