@@ -5,7 +5,7 @@
 
 struct RasterizedChar
 {
-	char character{};
+	wchar_t character{};
 	glm::ivec2 glyphSize{};
 	glm::ivec2 glyphBearing{};
 	uint32_t glyphAdvance{};
@@ -14,5 +14,5 @@ struct RasterizedChar
 struct FontRasterizationResult
 {
 	rendell::Texture2DArray* texture2DArray{};
-	std::vector<RasterizedChar>* rasterizedChars{};
+	std::vector<RasterizedChar> rasterizedChars{};
 };

@@ -13,6 +13,7 @@ set(SOURCE_FILE_PATHS
     src/Window.cpp
     src/FontRaster.cpp
     src/TextRenderer.cpp
+    src/Renderer/TextBatch.cpp
 
 )
 

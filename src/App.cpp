@@ -50,13 +50,15 @@ int App::run()
 
 	rendell::setClearBits(rendell::colorBufferBit | rendell::depthBufferBit);
 
+	_textRenderer->setText(L"Hello World!");
+
 	const float color = 31.0 / 255;
 	while (_mainWindow->isOpen())
 	{
 		rendell::clear();
 		rendell::clearColor(color, color, color, 1);
 
-		_textRenderer->draw(L"Hello World!");
+		_textRenderer->draw();
 
 		_mainWindow->swapBuffers();
 		_mainWindow->processEvents();
@@ -92,20 +94,14 @@ bool App::initRendell()
 
 bool App::initTextRenderer()
 {
-	FontRaster raster("../res/Fonts/mononoki/mononoki-Regular.ttf");
-	if (!raster.isInitialized())
+	IFontRaster *raster = new FontRaster("../res/Fonts/mononoki/mononoki-Regular.ttf");
+	if (!raster->isInitialized())
 	{
 		std::cout << "ERROR: FontRaster initializion failed" << std::endl;
 		return false;
 	}
-	raster.setFontSize(FONT_WIDTH, FONT_HEIGHT);
-	FontRasterizationResult fontRasterizationResult;
-	if (!raster.rasterize(fontRasterizationResult))
-	{
-		std::cout << "ERROR: FontRaster rasterization failed" << std::endl;
-		return false;
-	}
-	_textRenderer.reset(new TextRenderer(fontRasterizationResult, 600, 400));
+	raster->setFontSize(glm::ivec2(FONT_WIDTH, FONT_HEIGHT));
+	_textRenderer.reset(new TextRenderer(raster));
 	return _textRenderer->isInitialized();
 }
 
@@ -113,7 +109,7 @@ void App::setupTextRenderer()
 {
 	Matrices matrices;
 	matrices.projectMat = glm::ortho(0.0f, 600.0f, 0.0f, 400.0f, 0.1f, 100.0f);
-	matrices.worldMat = glm::translate(glm::mat4(1.0), glm::vec3(10, 10, 0.0));
+	matrices.worldMat = glm::translate(glm::mat4(1.0), glm::vec3(10.0, 10.0, 0.0));
 	glm::mat4 matrix = matrices.projectMat * matrices.viewMat * matrices.worldMat;
 	_textRenderer->setMatrix(matrix);
 	_textRenderer->setFontSize(glm::vec2(FONT_WIDTH, FONT_HEIGHT));
