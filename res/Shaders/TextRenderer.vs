@@ -6,64 +6,30 @@ layout(location = 0) in vec2 a_VertexPosition;
 
 uniform mat4 u_Matrix;
 uniform vec2 u_FontSize;
+uniform int u_CharFrom;
 
 buffer textBuffer { uint text[]; };
-buffer glyphSizeBuffer { vec2 glyphSizes[]; };
-buffer glyphBearingBuffer { vec2 glyphBearings[]; };
-buffer glyphAdvanceBuffer { uint glyphAdvances[]; };
+buffer glyphMatrixBuffer { mat4 glyphMatrices[]; };
 
 out vec2 v_UV;
-flat out uint v_Character;
+flat out uint v_TextureIndex;
 
-uint getCharacter(int characterIndex)
-{
-	return text[characterIndex];
-}
-
-uint getGlyphAdvanceInPixels(uint character)
-{
-	return glyphAdvances[character] >> 6;
-}
-
-vec2 getGlyphSize(uint character)
-{
-	return glyphSizes[character];
-}
-
-vec2 getLocalOffset(uint character)
-{
-	const vec2 bearing = glyphBearings[character];
-	const vec2 size = getGlyphSize(character);
-	return vec2(bearing.x, bearing.y - size.y);
-}
-
-vec2 getGlobalOffset(int characterIndex)
-{
-	vec2 result = vec2(0.0, 0.0);
-	for (int i = 0; i < characterIndex; i++) {
-		const uint character = getCharacter(i);
-		if (character == NEW_LINE_CHARACTER) {
-			result.x = 0.0;
-			result.y -= u_FontSize.y;
-		} else {
-			result.x += getGlyphAdvanceInPixels(character);
-		}
-	}
-	return result;
+vec3 getScaleFromMat4(mat4 matrix) {
+    vec3 scale;
+    scale.x = length(matrix[0].xyz);
+    scale.y = length(matrix[1].xyz);
+    scale.z = length(matrix[2].xyz);
+    return scale;
 }
 
 void main()
 {
-	const int characterIndex = gl_InstanceID;
-	const uint character = getCharacter(characterIndex);
+	const uint characterIndex = gl_InstanceID;
+	const uint character = text[characterIndex];
+	const mat4 glyphMatrix = glyphMatrices[characterIndex];
 
-	const vec2 size = getGlyphSize(character);
-	const vec2 localOffset = getLocalOffset(character);
-	const vec2 globalOffset = getGlobalOffset(characterIndex);
-	const vec2 pos = a_VertexPosition * size + localOffset + globalOffset;
-	
-	gl_Position = u_Matrix * vec4(pos, -1.0, 1.0);
-	vec2 baseSize = vec2(64.0, 64.0);
+	gl_Position = u_Matrix * glyphMatrix * vec4(a_VertexPosition, -1.0, 1.0);
+	vec2 size = getScaleFromMat4(glyphMatrix).xy;
 	v_UV = vec2(a_VertexPosition.x, 1.0 - a_VertexPosition.y) * size / u_FontSize;
-	v_Character = character;
+	v_TextureIndex = character - u_CharFrom;
 }
