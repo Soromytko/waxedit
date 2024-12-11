@@ -21,6 +21,7 @@ static uint32_t s_fontSizeUniformIndex{};
 static uint32_t s_colorUniformIndex{};
 static uint32_t s_charFromUniformIndex{};
 static uint32_t s_textureArrayUniformIndex{};
+static uint32_t s_instanceCount{};
 static bool s_initialized = false;
 
 static rendell::VertexArray* createVertexArray()
@@ -115,15 +116,27 @@ static bool initStaticRendererStuff()
 	return false;
 }
 
+static void releaseStaticRendererStuff()
+{
+	s_vertexArray.reset(nullptr);
+	s_shaderProgram.reset(nullptr);
+	s_initialized = false;
+}
+
 TextRenderer::TextRenderer(IFontRaster* fontRaster)
 {
+	s_instanceCount++;
 	_fontRaster.reset(fontRaster);
 	init();
 }
 
 TextRenderer::~TextRenderer()
 {
-
+	s_instanceCount--;
+	if (s_instanceCount == 0)
+	{
+		releaseStaticRendererStuff();
+	}
 }
 
 bool TextRenderer::isInitialized() const

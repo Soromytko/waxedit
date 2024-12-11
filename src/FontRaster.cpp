@@ -6,13 +6,13 @@ static FT_Library s_freetype;
 
 FontRaster::FontRaster(const std::filesystem::path& fontPath)
 {
+	s_instanceCount++;
+
 	if (!init())
 	{
 		std::cout << "ERROR:FontRaster: Initialization failure" << std::endl;
 		return;
 	}
-
-	s_instanceCount++;
 
 	setFontPath(fontPath);
 }
