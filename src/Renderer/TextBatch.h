@@ -13,7 +13,7 @@ public:
 	void addCharacter(wchar_t character, glm::vec2 offset);
 	void endUpdating();
 
-	void bind(uint32_t textureBlock, uint32_t textBufferBinding, uint32_t matrixBufferBinding) const;
+	void bind(uint32_t textureBlock, uint32_t textBufferBinding, uint32_t transformBufferBinding) const;
 	void unbind() const;
 
 	const RasterizedChar& getRasterizedChar(wchar_t character) const;
@@ -25,10 +25,10 @@ private:
 	FontRasterizationResult _fontRasterizationResult{};
 
 	std::vector<uint32_t> _textBufferData{};
-	std::vector<glm::mat4> _matrixBufferData{};
+	std::vector<glm::vec4> _transformBufferData{};
 
 	std::pair<wchar_t, wchar_t> _range{};
 	std::unique_ptr<rendell::Texture2DArray> _textures{};
 	std::unique_ptr<rendell::ShaderBuffer> _textBuffer{};
-	std::unique_ptr<rendell::ShaderBuffer> _matrixBuffer{};
+	std::unique_ptr<rendell::ShaderBuffer> _transformBuffer{};
 };

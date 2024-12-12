@@ -11,7 +11,7 @@ TextBatch::TextBatch(wchar_t from, wchar_t to, IFontRaster *fontRaster)
 
 	const size_t length = static_cast<size_t>(to - from);
 	_textBufferData.resize(length);
-	_matrixBufferData.resize(length);
+	_transformBufferData.resize(length);
 
 	if (!fontRaster->rasterize(from, to, _fontRasterizationResult))
 	{
@@ -20,7 +20,7 @@ TextBatch::TextBatch(wchar_t from, wchar_t to, IFontRaster *fontRaster)
 
 	_textures.reset(_fontRasterizationResult.texture2DArray);
 	_textBuffer.reset(rendell::createShaderBuffer(nullptr, length * sizeof(uint32_t)));
-	_matrixBuffer.reset(rendell::createShaderBuffer(nullptr, length * sizeof(glm::mat4)));
+	_transformBuffer.reset(rendell::createShaderBuffer(nullptr, length * sizeof(glm::mat4)));
 }
 
 void TextBatch::beginUpdating()
@@ -35,12 +35,10 @@ void TextBatch::addCharacter(wchar_t character, glm::vec2 offset)
 #endif
 	const RasterizedChar& rasterizedChar = _fontRasterizationResult.rasterizedChars[character - _range.first];
 
-	glm::mat4 glyphMatrix(1.0);
-	glyphMatrix = glm::translate(glyphMatrix, glm::vec3(offset, 0.0f));
-	glyphMatrix = glm::scale(glyphMatrix, glm::vec3(rasterizedChar.glyphSize, 1.0f));
+	glm::vec4 glyphTransform(offset, rasterizedChar.glyphSize.x, rasterizedChar.glyphSize.y);
 
 	_textBufferData[_counter] = static_cast<uint32_t>(character);
-	_matrixBufferData[_counter] = std::move(glyphMatrix);
+	_transformBufferData[_counter] = std::move(glyphTransform);
 	_counter++;
 }
 
@@ -50,24 +48,24 @@ void TextBatch::endUpdating()
 		static_cast<const void*>(_textBufferData.data()),
 		_counter * sizeof(uint32_t)
 	);
-	_matrixBuffer->setSubData(
-		static_cast<const void*>(_matrixBufferData.data()),
+	_transformBuffer->setSubData(
+		static_cast<const void*>(_transformBufferData.data()),
 		_counter * sizeof(glm::mat4)
 	);
 }
 
-void TextBatch::bind(uint32_t textureBlock, uint32_t textBufferBinding, uint32_t matrixBufferBinding) const
+void TextBatch::bind(uint32_t textureBlock, uint32_t textBufferBinding, uint32_t transformBufferBinding) const
 {
 	_textures->bind(textureBlock);
 	_textBuffer->bind(textBufferBinding);
-	_matrixBuffer->bind(matrixBufferBinding);
+	_transformBuffer->bind(transformBufferBinding);
 }
 
 void TextBatch::unbind() const
 {
 	_textures->unbind();
 	_textBuffer->unbind();
-	_matrixBuffer->unbind();
+	_transformBuffer->unbind();
 }
 
 const RasterizedChar& TextBatch::getRasterizedChar(wchar_t character) const

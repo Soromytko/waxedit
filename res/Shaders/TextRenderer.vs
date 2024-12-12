@@ -9,27 +9,20 @@ uniform vec2 u_FontSize;
 uniform int u_CharFrom;
 
 buffer textBuffer { uint text[]; };
-buffer glyphMatrixBuffer { mat4 glyphMatrices[]; };
+buffer glyphTransformBuffer { vec4 glyphTransforms[]; };
 
 out vec2 v_UV;
 flat out uint v_TextureIndex;
-
-vec3 getScaleFromMat4(mat4 matrix) {
-    vec3 scale;
-    scale.x = length(matrix[0].xyz);
-    scale.y = length(matrix[1].xyz);
-    scale.z = length(matrix[2].xyz);
-    return scale;
-}
 
 void main()
 {
 	const uint characterIndex = gl_InstanceID;
 	const uint character = text[characterIndex];
-	const mat4 glyphMatrix = glyphMatrices[characterIndex];
+	const vec4 glyphTransform = glyphTransforms[characterIndex];
+	const vec2 offset = glyphTransform.xy;
+	const vec2 scale = glyphTransform.zw;
 
-	gl_Position = u_Matrix * glyphMatrix * vec4(a_VertexPosition, -1.0, 1.0);
-	vec2 size = getScaleFromMat4(glyphMatrix).xy;
-	v_UV = vec2(a_VertexPosition.x, 1.0 - a_VertexPosition.y) * size / u_FontSize;
+	gl_Position = u_Matrix * vec4(a_VertexPosition * scale + offset, -1.0, 1.0);
+	v_UV = vec2(a_VertexPosition.x, 1.0 - a_VertexPosition.y) * scale / u_FontSize;
 	v_TextureIndex = character - u_CharFrom;
 }

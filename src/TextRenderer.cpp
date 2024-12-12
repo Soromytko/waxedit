@@ -9,7 +9,7 @@
 
 #define UNIFORM_BUFFER_BINDING 0
 #define TEXT_BUFFER_BINDING 1
-#define GLYPH_MATRIX_BUFFER_BINDING 2
+#define GLYPH_TRANSFORM_BUFFER_BINDING 2
 
 static const char* s_vertShaderFilePath = "../res/Shaders/TextRenderer.vs";
 static const char* s_fragShaderFilePath = "../res/Shaders/TextRenderer.fs";
@@ -100,7 +100,7 @@ static bool initStaticRendererStuff()
 	if (s_vertexArray != nullptr && s_shaderProgram != nullptr)
 	{
 		s_shaderProgram->setShaderBufferBinding("textBuffer", TEXT_BUFFER_BINDING);
-		s_shaderProgram->setShaderBufferBinding("glyphMatrixBuffer", GLYPH_MATRIX_BUFFER_BINDING);
+		s_shaderProgram->setShaderBufferBinding("glyphTransformBuffer", GLYPH_TRANSFORM_BUFFER_BINDING);
 
 		s_matrixUniformIndex = s_shaderProgram->getUniformIndex("u_Matrix");
 		s_fontSizeUniformIndex = s_shaderProgram->getUniformIndex("u_FontSize");
@@ -191,7 +191,7 @@ void TextRenderer::draw()
 
 	for (TextBatch* textBatch : _textBatchesForRendering)
 	{
-		textBatch->bind(TEXTURE_ARRAY_BLOCK, TEXT_BUFFER_BINDING, GLYPH_MATRIX_BUFFER_BINDING);
+		textBatch->bind(TEXTURE_ARRAY_BLOCK, TEXT_BUFFER_BINDING, GLYPH_TRANSFORM_BUFFER_BINDING);
 		s_shaderProgram->setUniformInt1(s_charFromUniformIndex, textBatch->getRange().first);
 		rendell::drawTriangleStripArraysInstanced(0, 4, _text.length());
 		textBatch->unbind();
