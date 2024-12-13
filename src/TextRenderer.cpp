@@ -189,12 +189,17 @@ void TextRenderer::draw()
 
 	beginDrawing();
 
-	for (TextBatch* textBatch : _textBatchesForRendering)
+	for (const TextBatch* textBatch : _textBatchesForRendering)
 	{
-		textBatch->bind(TEXTURE_ARRAY_BLOCK, TEXT_BUFFER_BINDING, GLYPH_TRANSFORM_BUFFER_BINDING);
-		s_shaderProgram->setUniformInt1(s_charFromUniformIndex, textBatch->getRange().first);
-		rendell::drawTriangleStripArraysInstanced(0, 4, _text.length());
-		textBatch->unbind();
+		textBatch->glyphBuffer->bind(TEXTURE_ARRAY_BLOCK);
+		s_shaderProgram->setUniformInt1(s_charFromUniformIndex, textBatch->glyphBuffer->getRange().first);
+		for (const TextBuffer* textBuffer : textBatch->textBuffers)
+		{
+			textBuffer->bind(TEXT_BUFFER_BINDING, GLYPH_TRANSFORM_BUFFER_BINDING);
+			rendell::drawTriangleStripArraysInstanced(0, 4, _text.length());
+			textBuffer->unbind();
+		}
+		textBatch->glyphBuffer->unbind();
 	}
 
 	endDrawing();
@@ -254,7 +259,7 @@ void TextRenderer::updateShaderBuffers()
 		if (currentCharacter != ' ')
 		{
 			const glm::vec2 glyphOffset = currentOffset + getInstanceLocalOffset(rasterizedChar);
-			textBatch->addCharacter(currentCharacter, glyphOffset);
+			textBatch->appendCharacter(currentCharacter, glyphOffset);
 		}
 
 		currentOffset.x += (rasterizedChar.glyphAdvance >> 6);
@@ -287,13 +292,20 @@ TextBatch* TextRenderer::createTextBatch(wchar_t character)
 	const uint16_t rangeIndex = static_cast<uint16_t>(character) / CHAR_RANGE_SIZE;
 	if (auto it = _textBatches.find(rangeIndex); it != _textBatches.end())
 	{
-		return it->second;
+		return it->second.get();
 	}
 
-	TextBatch* textBatch = new TextBatch(
-		static_cast<wchar_t>(rangeIndex * CHAR_RANGE_SIZE),
-		static_cast<wchar_t>((rangeIndex + 1) * CHAR_RANGE_SIZE), _fontRaster.get());
-	_textBatches[rangeIndex] = textBatch;
+	//TextBatch* textBatch = new TextBatch(
+	//	static_cast<wchar_t>(rangeIndex * CHAR_RANGE_SIZE),
+	//	static_cast<wchar_t>((rangeIndex + 1) * CHAR_RANGE_SIZE), _fontRaster.get());
+
+	TextBatch* textBatch = new TextBatch;
+	_textBatches[rangeIndex] = std::make_unique<TextBatch>(textBatch);
 
 	return textBatch;
+}
+
+void TextRenderer::addCharacterToTextBatch(const RasterizedChar& rasterizedChar)
+{
+
 }
