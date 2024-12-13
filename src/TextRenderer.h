@@ -5,7 +5,9 @@
 #include <rendell/rendell.h>
 #include <glm/glm.hpp>
 #include "IFontRaster.h"
-#include "Renderer/TextBatch.h"
+#include "Rendering/GlyphBuffer.h"
+#include "Rendering/TextBatch.h"
+#include "Rendering/TextBuffer.h"
 
 class TextRenderer
 {
@@ -43,7 +45,7 @@ private:
 
 	std::shared_ptr<IFontRaster> _fontRaster{ nullptr };
 
-	std::map<uint32_t, TextBatch*> _textBatches{};
+	std::map<uint32_t, std::unique_ptr<TextBatch>> _textBatches{};
 	std::unordered_set<TextBatch*> _textBatchesForRendering{};
 
 	std::wstring _text{};

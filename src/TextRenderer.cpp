@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #define CHAR_RANGE_SIZE 200
+#define TEXT_BUFFER_SIZE 100
 
 #define TEXTURE_ARRAY_BLOCK 0
 
@@ -189,12 +190,18 @@ void TextRenderer::draw()
 
 	beginDrawing();
 
-	for (TextBatch* textBatch : _textBatchesForRendering)
+	for (const TextBatch* textBatch : _textBatchesForRendering)
 	{
-		textBatch->bind(TEXTURE_ARRAY_BLOCK, TEXT_BUFFER_BINDING, GLYPH_TRANSFORM_BUFFER_BINDING);
-		s_shaderProgram->setUniformInt1(s_charFromUniformIndex, textBatch->getRange().first);
-		rendell::drawTriangleStripArraysInstanced(0, 4, _text.length());
-		textBatch->unbind();
+		const GlyphBuffer* glyphBuffer = textBatch->getGlyphBuffer();
+		glyphBuffer->bind(TEXTURE_ARRAY_BLOCK);
+		s_shaderProgram->setUniformInt1(s_charFromUniformIndex, glyphBuffer->getRange().first);
+		for (const std::unique_ptr<TextBuffer> &textBuffer : textBatch->GetTextBuffers())
+		{
+			textBuffer->bind(TEXT_BUFFER_BINDING, GLYPH_TRANSFORM_BUFFER_BINDING);
+			rendell::drawTriangleStripArraysInstanced(0, 4, static_cast<uint32_t>(textBuffer->getCurrentLength()));
+			textBuffer->unbind();
+		}
+		glyphBuffer->unbind();
 	}
 
 	endDrawing();
@@ -249,12 +256,12 @@ void TextRenderer::updateShaderBuffers()
 			_textBatchesForRendering.insert(textBatch);
 		}
 
-		const RasterizedChar& rasterizedChar = textBatch->getRasterizedChar(currentCharacter);
+		const RasterizedChar& rasterizedChar = textBatch->getGlyphBuffer()->getRasterizedChar(currentCharacter);
 
 		if (currentCharacter != ' ')
 		{
 			const glm::vec2 glyphOffset = currentOffset + getInstanceLocalOffset(rasterizedChar);
-			textBatch->addCharacter(currentCharacter, glyphOffset);
+			textBatch->appendCharacter(currentCharacter, glyphOffset);
 		}
 
 		currentOffset.x += (rasterizedChar.glyphAdvance >> 6);
@@ -287,13 +294,16 @@ TextBatch* TextRenderer::createTextBatch(wchar_t character)
 	const uint16_t rangeIndex = static_cast<uint16_t>(character) / CHAR_RANGE_SIZE;
 	if (auto it = _textBatches.find(rangeIndex); it != _textBatches.end())
 	{
-		return it->second;
+		return it->second.get();
 	}
 
-	TextBatch* textBatch = new TextBatch(
+	GlyphBuffer* glyphBuffer = new GlyphBuffer(
 		static_cast<wchar_t>(rangeIndex * CHAR_RANGE_SIZE),
-		static_cast<wchar_t>((rangeIndex + 1) * CHAR_RANGE_SIZE), _fontRaster.get());
-	_textBatches[rangeIndex] = textBatch;
+		static_cast<wchar_t>((rangeIndex + 1) * CHAR_RANGE_SIZE),
+		_fontRaster.get()
+	);
+	TextBatch* textBatch = new TextBatch(glyphBuffer, TEXT_BUFFER_SIZE);
+	_textBatches[rangeIndex] = std::unique_ptr<TextBatch>(textBatch);
 
 	return textBatch;
 }

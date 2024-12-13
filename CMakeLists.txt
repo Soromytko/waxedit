@@ -13,7 +13,9 @@ set(SOURCE_FILE_PATHS
     src/Window.cpp
     src/FontRaster.cpp
     src/TextRenderer.cpp
-    src/Renderer/TextBatch.cpp
+    src/Rendering/TextBuffer.cpp
+    src/Rendering/GlyphBuffer.cpp
+    src/Rendering/TextBatch.cpp
 
 )
 
