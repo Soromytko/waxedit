@@ -35,6 +35,7 @@ void TextBatch::appendCharacter(wchar_t character, glm::vec2 offset)
 
 void TextBatch::endUpdating()
 {
+	_textBuffers.resize(_counter + 1);
 	for (std::unique_ptr<TextBuffer>& textBuffer : _textBuffers)
 	{
 		textBuffer->endUpdating();
@@ -49,10 +50,5 @@ const GlyphBuffer* TextBatch::getGlyphBuffer() const
 const std::vector<std::unique_ptr<TextBuffer>>& TextBatch::GetTextBuffers() const
 {
 	return _textBuffers;
-}
-
-void TextBatch::trimTextBuffers()
-{
-	_textBuffers.resize(_counter + 1);
 }
 

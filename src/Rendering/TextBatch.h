@@ -19,8 +19,6 @@ public:
 	const std::vector<std::unique_ptr<TextBuffer>>& GetTextBuffers() const;
 
 private:
-	void trimTextBuffers();
-
 	size_t _counter{};
 	size_t _textBufferSize{};
 
