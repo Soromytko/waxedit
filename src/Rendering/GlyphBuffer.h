@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <rendell/rendell.h>
-#include "../IFontRaster.h"
+#include "IFontRaster.h"
 
 class GlyphBuffer
 {

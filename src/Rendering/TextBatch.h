@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include "GlyphBuffer.h"
 #include "TextBuffer.h"
-#include "../IFontRaster.h"
+#include "IFontRaster.h"
 
 struct TextBatch
 {

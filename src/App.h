@@ -1,6 +1,6 @@
 #pragma once
 #include "Window.h"
-#include "TextRenderer.h"
+#include "Rendering/TextRenderer.h"
 
 class App final
 {

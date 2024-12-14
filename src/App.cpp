@@ -6,7 +6,7 @@
 #include "App.h"
 #include "Window.h"
 #include <vector>
-#include "FontRaster.h"
+#include "Rendering/FontRaster.h"
 
 #define FONT_WIDTH 32.0f
 #define FONT_HEIGHT 32.0f

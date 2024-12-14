@@ -2,7 +2,7 @@
 #include <memory>
 #include <glm/glm.hpp>
 #include <rendell/rendell.h>
-#include "../IFontRaster.h"
+#include "FontRasterizationResult.h"
 
 class TextBuffer
 {

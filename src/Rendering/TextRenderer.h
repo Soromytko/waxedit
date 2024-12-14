@@ -5,9 +5,9 @@
 #include <rendell/rendell.h>
 #include <glm/glm.hpp>
 #include "IFontRaster.h"
-#include "Rendering/GlyphBuffer.h"
-#include "Rendering/TextBatch.h"
-#include "Rendering/TextBuffer.h"
+#include "GlyphBuffer.h"
+#include "TextBatch.h"
+#include "TextBuffer.h"
 
 class TextRenderer
 {
