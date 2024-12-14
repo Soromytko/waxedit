@@ -1,6 +1,6 @@
 #include "GlyphBuffer.h"
 
-GlyphBuffer::GlyphBuffer(wchar_t from, wchar_t to, IFontRaster* fontRaster)
+GlyphBuffer::GlyphBuffer(wchar_t from, wchar_t to, FontRasterizationResult&& fontRasterizationResult)
 {
 #ifdef _DEBIG
 	assert(from > 0);
@@ -8,11 +8,7 @@ GlyphBuffer::GlyphBuffer(wchar_t from, wchar_t to, IFontRaster* fontRaster)
 #endif
 	_range = { from, to };
 
-	if (!fontRaster->rasterize(from, to, _fontRasterizationResult))
-	{
-		std::cout << "ERROR:TextBatch: Rasterization failure, {" << from << ", " << to << "}" << std::endl;
-	}
-
+	_fontRasterizationResult = std::move(fontRasterizationResult);
 	_textures.reset(_fontRasterizationResult.texture2DArray);
 }
 

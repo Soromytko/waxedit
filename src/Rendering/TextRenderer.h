@@ -37,6 +37,7 @@ private:
 	void endDrawing();
 
 	TextBatch* createTextBatch(wchar_t character);
+	GlyphBuffer* createGlyphBuffer(uint16_t rangeIndex);
 
 	bool _initialized = false;
 	glm::mat4 _matrix{};

@@ -6,7 +6,7 @@
 class GlyphBuffer
 {
 public:
-	GlyphBuffer(wchar_t from, wchar_t to, IFontRaster* fontRaster);
+	GlyphBuffer(wchar_t from, wchar_t to, FontRasterizationResult&& fontRasterizationResult);
 
 	void bind(uint32_t textureBlock) const;
 	void unbind() const;

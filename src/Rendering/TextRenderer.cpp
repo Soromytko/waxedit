@@ -297,13 +297,22 @@ TextBatch* TextRenderer::createTextBatch(wchar_t character)
 		return it->second.get();
 	}
 
-	GlyphBuffer* glyphBuffer = new GlyphBuffer(
-		static_cast<wchar_t>(rangeIndex * CHAR_RANGE_SIZE),
-		static_cast<wchar_t>((rangeIndex + 1) * CHAR_RANGE_SIZE),
-		_fontRaster.get()
-	);
+	GlyphBuffer* glyphBuffer = createGlyphBuffer(rangeIndex);
 	TextBatch* textBatch = new TextBatch(glyphBuffer, TEXT_BUFFER_SIZE);
 	_textBatches[rangeIndex] = std::unique_ptr<TextBatch>(textBatch);
 
 	return textBatch;
+}
+
+GlyphBuffer* TextRenderer::createGlyphBuffer(uint16_t rangeIndex)
+{
+	const wchar_t from = static_cast<wchar_t>(rangeIndex * CHAR_RANGE_SIZE);
+	const wchar_t to = static_cast<wchar_t>((rangeIndex + 1) * CHAR_RANGE_SIZE);
+	FontRasterizationResult fontRasterizationResult;
+	if (!_fontRaster->rasterize(from, to, fontRasterizationResult))
+	{
+		std::cout << "ERROR:TextBatch: Rasterization failure, {" << from << ", " << to << "}" << std::endl;
+	}
+
+	return new GlyphBuffer(from, to, std::move(fontRasterizationResult));
 }
