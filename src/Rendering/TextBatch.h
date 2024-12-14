@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include <glm/glm.hpp>
-#include <rendell/rendell.h>
 #include "GlyphBuffer.h"
 #include "TextBuffer.h"
 #include "../IFontRaster.h"

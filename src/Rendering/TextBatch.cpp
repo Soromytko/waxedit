@@ -1,6 +1,4 @@
 #include "TextBatch.h"
-#include <glm/gtc/matrix_transform.hpp>
-#include <algorithm>
 
 TextBatch::TextBatch(GlyphBuffer* glyphBuffer, size_t textBufferSize)
 {
