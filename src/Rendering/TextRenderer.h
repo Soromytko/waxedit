@@ -22,6 +22,7 @@ public:
 	void setMatrix(const glm::mat4& matrix);
 	void setFontSize(const glm::vec2& fontSize);
 	void setColor(const glm::vec4& color);
+	void setBackgroundColor(const glm::vec4 backgroundColor);
 
 	const std::wstring& getText() const;
 	const glm::vec4& getColor() const;
@@ -43,6 +44,7 @@ private:
 	glm::mat4 _matrix{};
 	glm::vec2 _fontSize{};
 	glm::vec4 _color{};
+	glm::vec4 _backgroundColor{};
 
 	std::shared_ptr<IFontRaster> _fontRaster{ nullptr };
 

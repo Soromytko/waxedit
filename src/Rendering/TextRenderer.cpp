@@ -20,6 +20,7 @@ static std::unique_ptr<rendell::ShaderProgram> s_shaderProgram;
 static uint32_t s_matrixUniformIndex{};
 static uint32_t s_fontSizeUniformIndex{};
 static uint32_t s_colorUniformIndex{};
+static uint32_t s_backgroundColorUniformIndex{};
 static uint32_t s_charFromUniformIndex{};
 static uint32_t s_textureArrayUniformIndex{};
 static uint32_t s_instanceCount{};
@@ -106,6 +107,7 @@ static bool initStaticRendererStuff()
 		s_matrixUniformIndex = s_shaderProgram->getUniformIndex("u_Matrix");
 		s_fontSizeUniformIndex = s_shaderProgram->getUniformIndex("u_FontSize");
 		s_colorUniformIndex = s_shaderProgram->getUniformIndex("u_TextColor");
+		s_backgroundColorUniformIndex = s_shaderProgram->getUniformIndex("u_BackgroundColor");
 		s_charFromUniformIndex = s_shaderProgram->getUniformIndex("u_CharFrom");
 		s_textureArrayUniformIndex = s_shaderProgram->getUniformIndex("u_Textures");
 
@@ -170,6 +172,11 @@ void TextRenderer::setFontSize(const glm::vec2& fontSize)
 void TextRenderer::setColor(const glm::vec4& color)
 {
 	_color = color;
+}
+
+void TextRenderer::setBackgroundColor(const glm::vec4 backgroundColor)
+{
+	_backgroundColor = backgroundColor;
 }
 
 const std::wstring& TextRenderer::getText() const
@@ -281,6 +288,7 @@ void TextRenderer::beginDrawing()
 	s_shaderProgram->setUniformMat4(s_matrixUniformIndex, reinterpret_cast<const float*>(&_matrix));
 	s_shaderProgram->setUniformFloat2(s_fontSizeUniformIndex, _fontSize.x, _fontSize.y);
 	s_shaderProgram->setUniformFloat4(s_colorUniformIndex, _color.r, _color.g, _color.b, _color.a);
+	s_shaderProgram->setUniformVec4(s_backgroundColorUniformIndex, reinterpret_cast<const float*>(&_backgroundColor));
 }
 
 void TextRenderer::endDrawing()

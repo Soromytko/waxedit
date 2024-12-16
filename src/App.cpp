@@ -10,6 +10,7 @@
 
 #define FONT_WIDTH 32.0f
 #define FONT_HEIGHT 32.0f
+#define BACKGROUND_COLOR 31.0f / 255.0
 
 struct Matrices
 {
@@ -52,11 +53,10 @@ int App::run()
 
 	_textRenderer->setText(L"Hello World!");
 
-	const float color = 31.0 / 255;
 	while (_mainWindow->isOpen())
 	{
 		rendell::clear();
-		rendell::clearColor(color, color, color, 1);
+		rendell::clearColor(BACKGROUND_COLOR, BACKGROUND_COLOR, BACKGROUND_COLOR, 1);
 
 		_textRenderer->draw();
 
@@ -114,4 +114,5 @@ void App::setupTextRenderer()
 	_textRenderer->setMatrix(matrix);
 	_textRenderer->setFontSize(glm::vec2(FONT_WIDTH, FONT_HEIGHT));
 	_textRenderer->setColor(glm::vec4(0.0f, 1.0f, 1.0f, 1.0f));
+	_textRenderer->setBackgroundColor(glm::vec4(BACKGROUND_COLOR, BACKGROUND_COLOR, BACKGROUND_COLOR, 1.0f));
 }
