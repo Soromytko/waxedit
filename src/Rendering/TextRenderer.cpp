@@ -156,7 +156,7 @@ void TextRenderer::setText(const std::wstring& value)
 void TextRenderer::setText(std::wstring&& value)
 {
 	_text = std::move(value);
-	updateShaderBuffers();
+	_shouldBuffersBeUpdated = true;
 }
 
 void TextRenderer::setMatrix(const glm::mat4& matrix)
@@ -167,6 +167,8 @@ void TextRenderer::setMatrix(const glm::mat4& matrix)
 void TextRenderer::setFontSize(const glm::vec2& fontSize)
 {
 	_fontSize = fontSize;
+	_fontRaster->setFontSize(_fontSize);
+	_shouldBuffersBeUpdated = true;
 }
 
 void TextRenderer::setColor(const glm::vec4& color)
@@ -194,6 +196,8 @@ void TextRenderer::draw()
 	if (_text.length() == 0) {
 		return;
 	}
+
+	updateBuffersIfNeeded();
 
 	beginDrawing();
 
@@ -295,6 +299,16 @@ void TextRenderer::endDrawing()
 {
 	s_shaderProgram->unbind();
 	s_vertexArray->unbind();
+}
+
+void TextRenderer::updateBuffersIfNeeded()
+{
+	if (_shouldBuffersBeUpdated) {
+		_textBatches.clear();
+		_textBatchesForRendering.clear();
+		updateShaderBuffers();
+		_shouldBuffersBeUpdated = false;
+	}
 }
 
 TextBatch* TextRenderer::createTextBatch(wchar_t character)

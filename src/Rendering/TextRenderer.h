@@ -37,10 +37,13 @@ private:
 	void beginDrawing();
 	void endDrawing();
 
+	inline void updateBuffersIfNeeded();
+
 	TextBatch* createTextBatch(wchar_t character);
 	GlyphBuffer* createGlyphBuffer(uint16_t rangeIndex);
 
 	bool _initialized = false;
+	bool _shouldBuffersBeUpdated = false;
 	glm::mat4 _matrix{};
 	glm::vec2 _fontSize{};
 	glm::vec4 _color{};
