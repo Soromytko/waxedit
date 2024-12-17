@@ -144,7 +144,7 @@ TextRenderer::~TextRenderer()
 
 bool TextRenderer::isInitialized() const
 {
-	return _initialized;
+	return s_initialized;
 }
 
 void TextRenderer::setText(const std::wstring& value)
@@ -220,17 +220,17 @@ void TextRenderer::draw()
 
 bool TextRenderer::init()
 {
-	if (!_initialized)
+	if (!s_initialized)
 	{
-		_initialized = initStaticRendererStuff();
+		s_initialized = initStaticRendererStuff();
 	}
 
-	if (!_initialized)
+	if (!s_initialized)
 	{
 		return false;
 	}
 
-	return _initialized;
+	return s_initialized;
 }
 
 static glm::vec2 getInstanceLocalOffset(const RasterizedChar& rasterizedChar)
