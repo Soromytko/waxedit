@@ -12,7 +12,7 @@
 class TextRenderer
 {
 public:
-	TextRenderer(IFontRaster* fontRaster);
+	TextRenderer(std::shared_ptr<IFontRaster> fontRaster);
 	~TextRenderer();
 
 	bool isInitialized() const;
@@ -26,6 +26,7 @@ public:
 
 	const std::wstring& getText() const;
 	const glm::vec4& getColor() const;
+	std::shared_ptr<IFontRaster> getFontRaster() const;
 
 	void draw();
 

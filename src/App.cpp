@@ -101,7 +101,7 @@ bool App::initTextRenderer()
 		return false;
 	}
 	raster->setFontSize(glm::ivec2(FONT_WIDTH, FONT_HEIGHT));
-	_textRenderer.reset(new TextRenderer(raster));
+	_textRenderer.reset(new TextRenderer(std::shared_ptr<IFontRaster>(raster)));
 	return _textRenderer->isInitialized();
 }
 

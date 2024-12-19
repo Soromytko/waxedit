@@ -126,10 +126,10 @@ static void releaseStaticRendererStuff()
 	s_initialized = false;
 }
 
-TextRenderer::TextRenderer(IFontRaster* fontRaster)
+TextRenderer::TextRenderer(std::shared_ptr<IFontRaster> fontRaster)
 {
 	s_instanceCount++;
-	_fontRaster.reset(fontRaster);
+	_fontRaster = fontRaster;
 	init();
 }
 
@@ -189,6 +189,11 @@ const std::wstring& TextRenderer::getText() const
 const glm::vec4& TextRenderer::getColor() const
 {
 	return _color;
+}
+
+std::shared_ptr<IFontRaster> TextRenderer::getFontRaster() const
+{
+	return _fontRaster;
 }
 
 void TextRenderer::draw()
