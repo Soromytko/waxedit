@@ -14,7 +14,7 @@ FontRaster::FontRaster(const std::filesystem::path& fontPath)
 		return;
 	}
 
-	setFontPath(fontPath);
+	loadFont(fontPath);
 }
 
 FontRaster::~FontRaster()
@@ -42,9 +42,21 @@ const glm::ivec2& FontRaster::getFontSize() const
 	return _size;
 }
 
-void FontRaster::setFontPath(const std::filesystem::path& fontPath)
+bool FontRaster::loadFont(const std::filesystem::path& fontPath)
 {
+	if (_face)
+	{
+		releaseFace();
+	}
+
 	_fontPath = fontPath;
+	const std::string& path = _fontPath.string();
+	if (path.empty() || FT_New_Face(s_freetype, path.c_str(), 0, &_face)) {
+		std::cout << "ERROR::FREETYPE: Failed to create font face "  << fontPath << std::endl;
+		return false;
+	}
+
+	return true;
 }
 
 void FontRaster::setFontSize(const glm::ivec2& size)
@@ -55,24 +67,12 @@ void FontRaster::setFontSize(const glm::ivec2& size)
 bool FontRaster::rasterize(wchar_t from, wchar_t to, FontRasterizationResult& result)
 {
 #ifdef _DEBUG
+	assert(_face);
 	assert(s_freeTypeInitialized);
 	assert(from < to);
 #endif
 
-	const std::string& fontPath = _fontPath.string();
-	if (fontPath.empty())
-	{
-		std::cout << "ERROR::FREETYPE: Failed to load font_name" << std::endl;
-		return false;
-	}
-
-	FT_Face face;
-	if (FT_New_Face(s_freetype, fontPath.c_str(), 0, &face)) {
-		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
-		return false;
-	}
-
-	FT_Set_Pixel_Sizes(face, _size.x, _size.y);
+	FT_Set_Pixel_Sizes(_face, _size.x, _size.y);
 
 	const size_t charCount = static_cast<size_t>(to - from);
 	auto texture2DArray = rendell::createTexture2DArray(_size.x, _size.y, charCount, rendell::TextureFormat::R);
@@ -81,31 +81,34 @@ bool FontRaster::rasterize(wchar_t from, wchar_t to, FontRasterizationResult& re
 
 	for (wchar_t currentChar = from; currentChar < to; currentChar++)
 	{
-		if (FT_Load_Char(face, currentChar, FT_LOAD_RENDER))
+		FT_Glyph glyph;
+		if (!rasterizeChar(currentChar, glyph))
 		{
-			std::cout << "ERROR::FREETYTPE: Failed to load Glyph " << currentChar << std::endl;
-			continue;
+			std::cout << "ERROR::FREETYTPE: Failed to rasterize Glyph " << currentChar << std::endl;
+			glyph = getGlyphStub();
 		}
+
+		const FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(glyph);
 
 		texture2DArray->setSubTextureData(
 			static_cast<uint32_t>(currentChar - from),
-			static_cast<uint32_t>(face->glyph->bitmap.width),
-			static_cast<uint32_t>(face->glyph->bitmap.rows),
-			static_cast<const uint8_t*>(face->glyph->bitmap.buffer)
+			static_cast<uint32_t>(bitmapGlyph->bitmap.width),
+			static_cast<uint32_t>(bitmapGlyph->bitmap.rows),
+			static_cast<const uint8_t*>(bitmapGlyph->bitmap.buffer)
 		);
 
 		RasterizedChar rasterizedChar{
 			currentChar,
-			glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-			glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-			static_cast<uint32_t>(face->glyph->advance.x)
+			glm::ivec2(bitmapGlyph->bitmap.width, bitmapGlyph->bitmap.rows),
+			glm::ivec2(bitmapGlyph->left, bitmapGlyph->top),
+			static_cast<uint32_t>(_face->glyph->advance.x)
 		};
 		rasterizedChars.push_back(std::move(rasterizedChar));
+
+		FT_Done_Glyph(glyph);
 	}
 
-	FT_Done_Face(face);
-
-	result = { texture2DArray, std::move(rasterizedChars)};
+	result = { texture2DArray, std::move(rasterizedChars) };
 	return true;
 }
 
@@ -127,4 +130,40 @@ bool FontRaster::init()
 	}
 
 	return s_freeTypeInitialized;
+}
+
+void FontRaster::releaseFace()
+{
+#ifdef _DEBUG
+	assert(_face);
+#endif
+	FT_Done_Face(_face);
+	_face = nullptr;
+}
+
+bool FontRaster::rasterizeChar(wchar_t character, FT_Glyph& result)
+{
+	if (FT_Load_Char(_face, character, FT_LOAD_RENDER))
+	{
+		std::cout << "ERROR::FREETYPE: Failed to load Glyph " << character << std::endl;
+		return false;
+	}
+
+	if (FT_Get_Glyph(_face->glyph, &result))
+	{
+		std::cout << "ERROR::FREETYTPE: Failed to get Glyph " << character << std::endl;
+		return false;
+	}
+
+	return true;
+}
+
+FT_Glyph FontRaster::getGlyphStub()
+{
+	static FT_Glyph glyphStub = nullptr;
+	if (!glyphStub)
+	{
+		rasterizeChar(0, glyphStub);
+	}
+	return glyphStub;
 }
