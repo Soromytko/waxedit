@@ -23,7 +23,7 @@ private:
 	bool init();
 	void releaseFace();
 	bool rasterizeChar(wchar_t character, FT_Glyph &result);
-	FT_Glyph getGlyphStub();
+	FT_Glyph rasterizeGlyphStub();
 
 	FT_Face _face{ nullptr };
 	std::filesystem::path _fontPath{};

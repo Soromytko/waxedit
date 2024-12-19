@@ -85,7 +85,7 @@ bool FontRaster::rasterize(wchar_t from, wchar_t to, FontRasterizationResult& re
 		if (!rasterizeChar(currentChar, glyph))
 		{
 			std::cout << "ERROR::FREETYTPE: Failed to rasterize Glyph " << currentChar << std::endl;
-			glyph = getGlyphStub();
+			glyph = rasterizeGlyphStub();
 		}
 
 		const FT_BitmapGlyph bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(glyph);
@@ -158,12 +158,9 @@ bool FontRaster::rasterizeChar(wchar_t character, FT_Glyph& result)
 	return true;
 }
 
-FT_Glyph FontRaster::getGlyphStub()
+FT_Glyph FontRaster::rasterizeGlyphStub()
 {
-	static FT_Glyph glyphStub = nullptr;
-	if (!glyphStub)
-	{
-		rasterizeChar(0, glyphStub);
-	}
-	return glyphStub;
+	FT_Glyph result;
+	rasterizeChar(0, result);
+	return result;
 }
